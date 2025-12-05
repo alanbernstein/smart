@@ -2,7 +2,7 @@
 # Restore Nemo windows from saved session file
 
 # Configuration
-SAVE_FILE="$HOME/.config/nemo-session.txt"
+SAVE_FILE="$HOME/.config/smart-session/nemo-session.txt"
 
 # Check if save file exists
 if [ ! -f "$SAVE_FILE" ]; then
