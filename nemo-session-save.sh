@@ -62,10 +62,11 @@ window_count=$(grep -c . "$SAVE_FILE" 2>/dev/null || echo 0)
 
 if [ "$window_count" -eq 0 ]; then
     echo "No Nemo windows found."
+    echo "Symlink NOT updated (empty session)"
     rm -f "$SAVE_FILE"
     exit 1
 else
-    # Create symlink to latest file
+    # Create symlink to latest file (only if we have windows)
     ln -sf "$(basename "$SAVE_FILE")" "$SYMLINK_FILE"
 
     echo "Saved $window_count Nemo window(s) to $SAVE_FILE"

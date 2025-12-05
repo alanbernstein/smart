@@ -2,8 +2,8 @@
 # Restore windows from CSV session file based on a whitelist of applications
 
 # Configuration
-SESSION_FILE="$HOME/.config/window-session.csv"
-WHITELIST_FILE="$HOME/.config/window-whitelist.txt"
+SESSION_FILE="$HOME/.config/smart-session/window-session.csv"
+WHITELIST_FILE="$HOME/.config/smart-session/window-whitelist.txt"
 
 # Default whitelist (will be created if file doesn't exist)
 DEFAULT_WHITELIST="nemo
@@ -77,6 +77,21 @@ launch_app() {
             else
                 echo "  Warning: Could not parse Nemo path, skipping"
                 return
+            fi
+            ;;
+        terminator)
+            # Extract working directory from window title
+            # Terminator window titles often contain the path
+            if [[ "$window_title" =~ :\ ([^:]+)$ ]]; then
+                # Extract path after last colon (e.g., "user@host: /path")
+                workdir="${BASH_REMATCH[1]}"
+                terminator --working-directory="$workdir" &
+            elif [[ "$window_title" == ~* ]] || [[ "$window_title" == /* ]]; then
+                # Title is a path (with ~ or absolute)
+                terminator --working-directory="$window_title" &
+            else
+                # Fallback: just launch terminator
+                terminator &
             fi
             ;;
         firefox|chromium|chrome|google-chrome)

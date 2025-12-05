@@ -93,14 +93,19 @@ echo "]" >> "$SAVE_FILE"
 # Clean up temp file
 rm -f "$TEMP_FILE"
 
-# Create symlink to latest file
-ln -sf "$(basename "$SAVE_FILE")" "$SYMLINK_FILE"
-
 # Count windows saved
 window_count=$(grep -c '"window_id"' "$SAVE_FILE")
 
-echo "Saved $window_count window(s) to $SAVE_FILE"
-echo "Symlink updated: $SYMLINK_FILE -> $(basename "$SAVE_FILE")"
+# Only update symlink if we saved at least one window
+if [ "$window_count" -gt 0 ]; then
+    ln -sf "$(basename "$SAVE_FILE")" "$SYMLINK_FILE"
+    echo "Saved $window_count window(s) to $SAVE_FILE"
+    echo "Symlink updated: $SYMLINK_FILE -> $(basename "$SAVE_FILE")"
+else
+    echo "Saved $window_count window(s) to $SAVE_FILE"
+    echo "Symlink NOT updated (empty session)"
+fi
+
 echo ""
 echo "You can view the file with:"
 echo "  cat $SYMLINK_FILE"

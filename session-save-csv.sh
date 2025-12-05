@@ -69,14 +69,18 @@ wmctrl -lxp | while IFS= read -r line; do
     echo "\"$window_id\",$desktop,$pid,\"$process_name_csv\",\"$window_class_csv\",\"$window_title_csv\",\"$cmdline_csv\"" >> "$SAVE_FILE"
 done
 
-# Create symlink to latest file
-ln -sf "$(basename "$SAVE_FILE")" "$SYMLINK_FILE"
-
 # Count windows saved (subtract 1 for header)
 window_count=$(($(wc -l < "$SAVE_FILE") - 1))
 
-echo "Saved $window_count window(s) to $SAVE_FILE"
-echo "Symlink updated: $SYMLINK_FILE -> $(basename "$SAVE_FILE")"
+# Only update symlink if we saved at least one window
+if [ "$window_count" -gt 0 ]; then
+    ln -sf "$(basename "$SAVE_FILE")" "$SYMLINK_FILE"
+    echo "Saved $window_count window(s) to $SAVE_FILE"
+    echo "Symlink updated: $SYMLINK_FILE -> $(basename "$SAVE_FILE")"
+else
+    echo "Saved $window_count window(s) to $SAVE_FILE"
+    echo "Symlink NOT updated (empty session)"
+fi
 echo ""
 echo "You can view the file with:"
 echo "  cat $SYMLINK_FILE"
