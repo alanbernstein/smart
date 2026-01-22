@@ -22,9 +22,22 @@ if ! command -v wmctrl &> /dev/null; then
     exit 1
 fi
 
-# Set DISPLAY for cronjob compatibility
+# Set DISPLAY and XAUTHORITY for cronjob compatibility
 if [ -z "$DISPLAY" ]; then
     export DISPLAY="$SMART_DISPLAY"
+fi
+
+# Find and set XAUTHORITY if not already set (needed for cron jobs)
+if [ -z "$XAUTHORITY" ]; then
+    # Try common locations for X authority file
+    for auth_file in "/run/user/$(id -u)/gdm/Xauthority" \
+                     "/run/user/$(id -u)/.mutter-Xwaylandauth."* \
+                     "$HOME/.Xauthority"; do
+        if [ -f "$auth_file" ]; then
+            export XAUTHORITY="$auth_file"
+            break
+        fi
+    done
 fi
 
 echo "Saving all window states to JSON..."
