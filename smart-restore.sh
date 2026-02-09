@@ -150,18 +150,19 @@ launch_app() {
 restored_count=0
 skipped_count=0
 
-# Get the total number of windows
-total_windows=$(jq 'length' "$SESSION_FILE")
+# Sort windows by process name, then window title
+sorted_json=$(jq 'sort_by(.process_name, .window_title)' "$SESSION_FILE")
+total_windows=$(echo "$sorted_json" | jq 'length')
 
 echo "Found $total_windows window(s) in session file"
 echo ""
 
-# Iterate through each window in the JSON
+# Iterate through each window in the sorted JSON
 for i in $(seq 0 $((total_windows - 1))); do
     # Extract fields using jq
-    process_name=$(jq -r ".[$i].process_name" "$SESSION_FILE")
-    window_title=$(jq -r ".[$i].window_title" "$SESSION_FILE")
-    cmdline=$(jq -r ".[$i].cmdline" "$SESSION_FILE")
+    process_name=$(echo "$sorted_json" | jq -r ".[$i].process_name")
+    window_title=$(echo "$sorted_json" | jq -r ".[$i].window_title")
+    cmdline=$(echo "$sorted_json" | jq -r ".[$i].cmdline")
     
     # Check if process is whitelisted
     if is_whitelisted "$process_name"; then
